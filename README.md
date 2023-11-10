@@ -1,79 +1,64 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-# Getting Started
+# Jawaban
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## A. Topik: Komunikasi dengan Manajer Produk
 
-## Step 1: Start the Metro Server
+1. Apakah foto bisa di preview atau hanya statis seperti aplikasi Instagram?
+2. Apakah fitur "Read More" bisa dilakukan di halaman feeds/home? Tanpa harus membuat user membuka detail post terlebih dahulu.
+3. Apakah user bisa melakukan kedua aksi (upvote dan downvote) dalam satu konten?
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+## C1
 
-To start Metro, run the following command from the _root_ of your React Native project:
+### 1. Struktur yang akan digunakan.
 
-```bash
-# using npm
-npm start
+#### Dapatkan melalui API kontak.
 
-# OR using Yarn
-yarn start
-```
+a. Pada saat pengguna melakukan registrasi kita akan mengambil/meminta no handphone mereka yang dimana ini adalah tugas UI/UX untuk bisa menghandle pengalaman di aplikasi tanpa harus membuat user takut atau tidak ingin memberikan no handphoe tersebut.
+b. Kita juga akan mendapatkan email dari pengguna pada saat registrasi (sudah pasti).
 
-## Step 2: Start your Application
+Kedua data diatas yang sudah didapatkan (no handphone dan email) akan kita sinkronisasi dengan API contact yang ada di native aplikasi (Android/iOS). Ketika
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+#### Berdasarkan followings user.
 
-### For Android
+Kalau semisal kita membutuhkan sugesti "Orang yang mungkin dikenal" berdasarkan followers. Kita akan melakukan pendekatan dari kolom "followings" orang yang kita(pengguna) follows. Dan di function database kita akan menerapkan ini secara acak per request yang dilakukan ke aplikasi. Semisal, pada saat open-app 1st(pertama), kita ambil followings dari user A, dan open-app 2nd(kedua) kita ambil dari followings user B, dan seterusnya.
 
-```bash
-# using npm
-npm run android
+Sedangkan untuk data yang ditampilkan akan di limitasi berdasarkan relevansi kesukaan atau tags yang sama. Ini bisa di handle melalui firestore saya pikir, saya pernah melakukan ini. Dan salah satu query yang digunakan adalah "pengguna **BELUM** mengikuti orang-orang yang disuggestikan tsb".
 
-# OR using Yarn
-yarn android
-```
+#### Merge data
 
-### For iOS
+Data yang didapatkan dari kontak (berdasarkan referensi email dan no handphone) array nya akan kita gabungkan dengan data yang didapatkan dari query "followings user" atau "minat yang sama" atau "tags yang sama".
 
-```bash
-# using npm
-npm run ios
+### 2. Struktur yang akan digunakan.
 
-# OR using Yarn
-yarn ios
-```
+#### Tidak ada yang terkait
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+Buat call to action agar user melakukan follow seseorang atau siapapun. Tapi jika dari kontak API kita mendapatkan sugesti, tampilkan sugesti ini untuk pertama kali di halaman utama.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+#### Terlalu banyak yang terkait.
 
-## Step 3: Modifying your App
+Saya merasa jika data banyak akan lebih mudah di implementasikan. Karena sugesti yang bersifat random dan acak (berdasarkan parameter tertentu dari query) akan lebih menarik ditampilkan di UI. Query akan disimpan di database servis yang dinamis seperti MongoDB atau firestore. Query ini bersifat temporary dan bisa berubah sewaktu-waktu atau tidak digunakan lagi. Query ini yang akan kita update setiap pengguna membuka aplikasi, sampai data "people" di query tersebut benar-benar habis (tidak ada yang bisa di sugestikan lagi) maka kita akan regenerate query baru untuk kedepannya. Begitu terus-menerus.
 
-Now that you have successfully run the app, let's modify it.
+### 3. Pengujian Fitur
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+1. Saya generate 100 pengguna berbeda untuk data mockup.
+2. Login di 3 device berbeda.
+3. Masing-masing 3 user ini akan mengikuti orang-orang berbeda dari 100 orang tersebut.
+4. 3 user akan saling follow, atau bisa kita korbankan 1 yang tidak follow siapapun.
+5. Buat Query seperti penjelasan diatas.
+6. Fetch data berdasarkan query yang sudah dibuat pada masing-masing user.
+7. Yang kita harapkan adalah query berfungsi dengan baik pada masing-masing user dengan menampilkan orang-orang yang user A follow dan lain-lain.
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+## C2
 
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+1. Pengguna mendaftar ke aplikasi menggunakaan email/no handphone.
+2. Request "allow contacts" kepada user.
+3. Jika disetujui, segera dapatkan data dari kontak dan sinkronasi data tersebut dari database kita menggunakan metode "includes"(karena bentuk data akan array of emails/phone_numbers).
+4. Merge data yang dikembalikan dari database di suatu state (global state).
+5. Ajak user untuk mengikuti orang-orang yang didapatkan dari kontak tersebut.
+6. Ketika pengguna sudah follow salah satu pengguna dari sugesti kontak, maka akan kita cek followings dari "pengguna yang difollow".
+7. Cari relevansi berdasarkan tags yang sama dari followings yang pengguna follows.
+8. Jika ada, beberapa pengguna tersebut akan digabungkan (merge) ke global state yang sudah di jelaskan di no 4.
+9. Store semua hasil query dari global state tadi ke database dinamis (NoSQL).
+10. Kedepannya user hanya akan mengambil dari database dinamis tersebut, bersifat seperti cache namun di cloud.
+11. Limitasi data yang ditampilkan apabila sudah terlalu banyak.
