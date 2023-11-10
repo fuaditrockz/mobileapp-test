@@ -1,4 +1,6 @@
-import React from 'react';
+/* eslint-disable eslint-comments/no-unused-disable */
+/* eslint-disable react-native/no-inline-styles */
+import React, {useContext, useState, useEffect} from 'react';
 import {
   Button,
   Image,
@@ -9,19 +11,88 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 import IconBack from '../assets/back.png';
 import IconBlock from '../assets/block.png';
 import IconComment from '../assets/comment.png';
-import IconDownvoteActive from '../assets/downvote_active.png';
-import IconDownvoteInactive from '../assets/downvote_inactive.png';
 import IconShare from '../assets/share.png';
-import IconUpvoteActive from '../assets/upvote_active.png';
-import IconUpvoteInactive from '../assets/upvote_inactive.png';
+import DownVote from '../components/DownVote';
+import UpVote from '../components/UpVote';
+import {SomeContext} from '../context';
+import {findMyDataInArray} from '../helpers';
 
 function PostDetailScreen() {
+  const {posts, setPosts, myData} = useContext(SomeContext);
   const navigation = useNavigation();
+  const route: any = useRoute();
+
+  const [isMeAlreadyDownVoted, setIsMeAlreadyDownVoted] =
+    useState<boolean>(false);
+  const [isMeAlreadyUpVoted, setIsMeAlreadyUpVoted] = useState<boolean>(false);
+
+  const [allDownVotes, setAllDownVotes] = useState<any[]>([]);
+  const [allUpVotes, setAllUpvotes] = useState<any[]>([]);
+
+  useEffect(() => {
+    const getMeInDownvotes = findMyDataInArray(route.params.downvotes, myData);
+    const getMeInUpvotes = findMyDataInArray(route.params.upvotes, myData);
+
+    if (getMeInDownvotes?.username === myData.username) {
+      setIsMeAlreadyDownVoted(true);
+    }
+    if (getMeInUpvotes?.username === myData.username) {
+      setIsMeAlreadyUpVoted(true);
+    }
+    setAllDownVotes(route.params.downvotes);
+    setAllUpvotes(route.params.upvotes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleVote = (type: 'upvote' | 'downvote') => {
+    if (type === 'upvote') {
+      setAllUpvotes((prevState: any[]) => [myData, ...prevState]);
+      setIsMeAlreadyUpVoted(true);
+    } else {
+      setAllDownVotes((prevState: any[]) => [myData, ...prevState]);
+      setIsMeAlreadyDownVoted(true);
+    }
+  };
+
+  const handleCancelVote = (type: 'upvote' | 'downvote') => {
+    if (type === 'upvote') {
+      setAllUpvotes(
+        allUpVotes.filter((x: any) => {
+          return x.username !== myData.username;
+        }),
+      );
+      setIsMeAlreadyUpVoted(false);
+    } else {
+      setAllDownVotes(
+        allDownVotes.filter((x: any) => {
+          return x.username !== myData.username;
+        }),
+      );
+      setIsMeAlreadyDownVoted(false);
+    }
+  };
+
+  const handleBack = () => {
+    let updatedPosts = posts.map((post: any) => {
+      if (post.id === route.params.id) {
+        return {
+          ...post,
+          downvotes: allDownVotes,
+          upvotes: allUpVotes,
+        };
+      }
+      return post;
+    });
+
+    setPosts(updatedPosts);
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView>
       <ScrollView style={{marginBottom: 48}}>
@@ -32,7 +103,7 @@ function PostDetailScreen() {
               alignItems: 'center',
               flexDirection: 'row',
             }}>
-            <Pressable onPress={() => navigation.goBack()}>
+            <Pressable onPress={handleBack}>
               <Image
                 source={IconBack}
                 height={18}
@@ -42,7 +113,7 @@ function PostDetailScreen() {
             </Pressable>
             <Image
               source={{
-                uri: 'https://picsum.photos/200',
+                uri: route.params.avatar_url,
               }}
               width={48}
               height={48}
@@ -51,29 +122,30 @@ function PostDetailScreen() {
             <View style={{marginLeft: 16}}>
               <Text
                 style={{fontWeight: '600', fontSize: 14, lineHeight: 16.94}}>
-                Usup Suparma
+                {route.params.full_name}
               </Text>
               <Text style={{fontWeight: '400', fontSize: 12, lineHeight: 18}}>
-                Mar 27, 2023
+                {route.params.created_at}
               </Text>
             </View>
           </View>
           <View style={{height: 0.5, backgroundColor: '#C4C4C4'}} />
           <View>
-            <Text style={{margin: 24}}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-              luctus in ipsum ac dictum. Integer et nunc ut tellus tinci,
-              consectetur adipiscing elit. Nulla luctus in ipsum ac dictum.
-              Integer et nunc ut tellus tinci, consectetur adipiscing elit.
-              Nulla luctus in ipsum ac dictum. Integer et nunc ut tellus tinci
-              Nulla luctus in ipsum ac dictum. Integer et nunc ut tellus tinci,
-              consectetur adipiscing elit. Nulla luctus in ipsum ac dictum.
-            </Text>
+            <View
+              style={{
+                marginHorizontal: 24,
+                marginTop: 10,
+                marginBottom: 15,
+                position: 'relative',
+              }}>
+              <Text style={{}}>{route.params.content}</Text>
+            </View>
             <Image
               source={{
-                uri: 'https://picsum.photos/200',
+                uri: route.params.image,
               }}
-              height={200}
+              height={300}
+              resizeMode="cover"
             />
           </View>
           <View
@@ -120,30 +192,18 @@ function PostDetailScreen() {
                 width={18}
                 style={{marginLeft: 22}}
               />
-              <Pressable onPress={() => console.log('downvote')}>
-                <Image
-                  source={IconDownvoteInactive}
-                  height={18}
-                  width={18}
-                  style={{marginLeft: 24}}
-                />
-              </Pressable>
-              <Text
-                style={{
-                  width: 24,
-                  marginHorizontal: 11,
-                  textAlign: 'center',
-                }}>
-                0
-              </Text>
-              <Pressable onPress={() => console.log('upvote')}>
-                <Image
-                  source={IconUpvoteInactive}
-                  height={18}
-                  width={18}
-                  style={{marginRight: 22}}
-                />
-              </Pressable>
+              <DownVote
+                totalVotes={allDownVotes.length}
+                isMeAlreadyVoted={isMeAlreadyDownVoted}
+                handleVote={() => handleVote('downvote')}
+                handleCancelVote={() => handleCancelVote('downvote')}
+              />
+              <UpVote
+                totalVotes={allUpVotes.length}
+                isMeAlreadyVoted={isMeAlreadyUpVoted}
+                handleVote={() => handleVote('upvote')}
+                handleCancelVote={() => handleCancelVote('upvote')}
+              />
             </View>
           </View>
         </View>
@@ -248,15 +308,14 @@ function PostDetailScreen() {
       <View
         style={{
           position: 'absolute',
-          bottom: 20,
-          height: 60,
+          bottom: 0,
+          height: 50,
           flexDirection: 'row',
           alignItems: 'center',
           width: '100%',
           paddingHorizontal: 24,
           zIndex: 10,
         }}>
-        <View style={{height: 0.5, backgroundColor: '#C4C4C4'}} />
         <TextInput placeholder="Enter Comment" style={{flex: 1}} />
         <Button title="Comment" onPress={() => console.log('comment')} />
       </View>
