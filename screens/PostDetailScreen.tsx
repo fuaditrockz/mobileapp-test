@@ -10,6 +10,7 @@ import {
   Text,
   TextInput,
   View,
+  Dimensions,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 
@@ -21,6 +22,7 @@ import DownVote from '../components/DownVote';
 import UpVote from '../components/UpVote';
 import {SomeContext} from '../context';
 import {findMyDataInArray} from '../helpers';
+import CommentCard from '../components/CommentCard';
 
 function PostDetailScreen() {
   const {posts, setPosts, myData} = useContext(SomeContext);
@@ -33,6 +35,9 @@ function PostDetailScreen() {
 
   const [allDownVotes, setAllDownVotes] = useState<any[]>([]);
   const [allUpVotes, setAllUpvotes] = useState<any[]>([]);
+  const [allComments, setAllComments] = useState<any[]>([]);
+
+  const [commentInput, setCommentInput] = useState<string>('');
 
   useEffect(() => {
     const getMeInDownvotes = findMyDataInArray(route.params.downvotes, myData);
@@ -46,6 +51,7 @@ function PostDetailScreen() {
     }
     setAllDownVotes(route.params.downvotes);
     setAllUpvotes(route.params.upvotes);
+    setAllComments(route.params.comments);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -77,6 +83,18 @@ function PostDetailScreen() {
     }
   };
 
+  const handleSubmitComment = () => {
+    setAllComments((prevState: any[]) => [
+      {
+        ...myData,
+        comment: commentInput,
+      },
+      ...prevState,
+    ]);
+
+    setCommentInput('');
+  };
+
   const handleBack = () => {
     let updatedPosts = posts.map((post: any) => {
       if (post.id === route.params.id) {
@@ -84,6 +102,7 @@ function PostDetailScreen() {
           ...post,
           downvotes: allDownVotes,
           upvotes: allUpVotes,
+          comments: allComments,
         };
       }
       return post;
@@ -93,9 +112,15 @@ function PostDetailScreen() {
     navigation.goBack();
   };
 
+  console.log('comment', commentInput);
+
   return (
     <SafeAreaView>
-      <ScrollView style={{marginBottom: 48}}>
+      <ScrollView
+        style={{
+          marginBottom: 48,
+          height: Dimensions.get('window').height - 80,
+        }}>
         <View>
           <View
             style={{
@@ -178,7 +203,7 @@ function PostDetailScreen() {
                   marginHorizontal: 4,
                   textAlign: 'center',
                 }}>
-                0
+                {allComments.length}
               </Text>
             </View>
             <View
@@ -208,102 +233,9 @@ function PostDetailScreen() {
           </View>
         </View>
         <View style={{height: 4, backgroundColor: '#C4C4C4'}} />
-        <View
-          style={{
-            flexDirection: 'row',
-            minHeight: 72,
-            paddingVertical: 16,
-            paddingHorizontal: 24,
-          }}>
-          <Image
-            source={{
-              uri: 'https://picsum.photos/200',
-            }}
-            width={36}
-            height={36}
-            style={{borderRadius: 24, marginRight: 16}}
-          />
-          <View style={{width: '90%'}}>
-            <Text
-              style={{
-                fontWeight: '600',
-                fontSize: 12,
-                lineHeight: 14.52,
-                color: '#828282',
-              }}>
-              Usup Suparma
-            </Text>
-            <Text style={{fontWeight: '400', fontSize: 16, lineHeight: 19.36}}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-              luctus in ipsum ac dictum. Integer et nunc ut tellus tinci,
-            </Text>
-          </View>
-        </View>
-        <View style={{height: 0.5, backgroundColor: '#C4C4C4'}} />
-        <View
-          style={{
-            flexDirection: 'row',
-            minHeight: 72,
-            paddingVertical: 16,
-            paddingHorizontal: 24,
-          }}>
-          <Image
-            source={{
-              uri: 'https://picsum.photos/200',
-            }}
-            width={36}
-            height={36}
-            style={{borderRadius: 24, marginRight: 16}}
-          />
-          <View style={{width: '90%'}}>
-            <Text
-              style={{
-                fontWeight: '600',
-                fontSize: 12,
-                lineHeight: 14.52,
-                color: '#828282',
-              }}>
-              Usup Suparma
-            </Text>
-            <Text style={{fontWeight: '400', fontSize: 16, lineHeight: 19.36}}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-              luctus in ipsum ac dictum. Integer et nunc ut tellus tinci,
-            </Text>
-          </View>
-        </View>
-        <View style={{height: 0.5, backgroundColor: '#C4C4C4'}} />
-        <View
-          style={{
-            flexDirection: 'row',
-            minHeight: 72,
-            paddingVertical: 16,
-            paddingHorizontal: 24,
-          }}>
-          <Image
-            source={{
-              uri: 'https://picsum.photos/200',
-            }}
-            width={36}
-            height={36}
-            style={{borderRadius: 24, marginRight: 16}}
-          />
-          <View style={{width: '90%'}}>
-            <Text
-              style={{
-                fontWeight: '600',
-                fontSize: 12,
-                lineHeight: 14.52,
-                color: '#828282',
-              }}>
-              Usup Suparma
-            </Text>
-            <Text style={{fontWeight: '400', fontSize: 16, lineHeight: 19.36}}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
-              luctus in ipsum ac dictum. Integer et nunc ut tellus tinci,
-            </Text>
-          </View>
-        </View>
-        <View style={{height: 0.5, backgroundColor: '#C4C4C4'}} />
+        {allComments.map((comment: any, index: number) => (
+          <CommentCard comment={comment} key={index} />
+        ))}
       </ScrollView>
       <View
         style={{
@@ -316,8 +248,19 @@ function PostDetailScreen() {
           paddingHorizontal: 24,
           zIndex: 10,
         }}>
-        <TextInput placeholder="Enter Comment" style={{flex: 1}} />
-        <Button title="Comment" onPress={() => console.log('comment')} />
+        <TextInput
+          placeholder="Enter Comment"
+          style={{flex: 1}}
+          onChangeText={setCommentInput}
+          value={commentInput}
+        />
+        <Button
+          title="Comment"
+          onPress={() => {
+            handleSubmitComment();
+            console.log('comment');
+          }}
+        />
       </View>
     </SafeAreaView>
   );

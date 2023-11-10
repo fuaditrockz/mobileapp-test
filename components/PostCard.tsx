@@ -17,7 +17,6 @@ const PostCard = ({content}: {content: any}) => {
   const {myData, posts} = useContext(SomeContext);
   const navigation = useNavigation<RootStackParamList>();
   const [totalContentLines, setTotalContentLines] = useState<number>(0);
-  const [totalComments] = useState<number>(content?.comments.length);
 
   const [isMeAlreadyDownVoted, setIsMeAlreadyDownVoted] =
     useState<boolean>(false);
@@ -25,6 +24,7 @@ const PostCard = ({content}: {content: any}) => {
 
   const [allDownVotes, setAllDownVotes] = useState<any[]>([]);
   const [allUpVotes, setAllUpvotes] = useState<any[]>([]);
+  const [allComments, setAllComments] = useState<any[]>([]);
 
   useEffect(() => {
     const getMeInDownvotes = findMyDataInArray(content.downvotes, myData);
@@ -35,6 +35,7 @@ const PostCard = ({content}: {content: any}) => {
 
     setAllDownVotes(content.downvotes);
     setAllUpvotes(content.upvotes);
+    setAllComments(content.comments);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posts]);
 
@@ -175,7 +176,7 @@ const PostCard = ({content}: {content: any}) => {
                 marginHorizontal: 4,
                 textAlign: 'center',
               }}>
-              {totalComments}
+              {allComments.length}
             </Text>
           </View>
           <View

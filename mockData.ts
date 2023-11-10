@@ -42,12 +42,14 @@ export const mockData = [
     comments: [
       {
         full_name: 'Bang Jali',
-        avatar_url: 'https://d2v9ipibika81v.cloud',
+        avatar_url:
+          'https://image.cnbcfm.com/api/v1/image/105897632-1557241558937avatar-e1541360922907.jpg?v=1664130328&w=929&h=523&vtcrop=y',
         comment: 'Kau ni ape? Kau tinggal disini ke?',
       },
       {
         full_name: 'Si Kadir Ganteng',
-        avatar_url: 'https://d2v9ipibika81v.cloud',
+        avatar_url:
+          'https://awsimages.detik.net.id/community/media/visual/2023/03/31/jackie-chan_43.png?w=600&q=90',
         comment: 'Iya deh apa sih',
       },
     ],
